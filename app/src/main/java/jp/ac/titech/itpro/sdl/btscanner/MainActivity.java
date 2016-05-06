@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -28,7 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-
+import android.content.DialogInterface;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -92,6 +93,27 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        devListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int pos, long id){
+               Log.d(TAG, "onDeviceselect");
+               BluetoothDevice device = devList.get(pos);
+               AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                      alert.setTitle("Device:" + device.getName());
+                      alert.setMessage(device.getAddress() + "\n"
+                              + device.getBondState());
+                      alert.setCancelable(false);
+                      alert.setPositiveButton("OK",
+                               new DialogInterface.OnClickListener() {
+                                   public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    // OK ボタンクリック処理
+                                   }
+                       });
+                      alert.show();
+            }
+        });
+
         btScanReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -122,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
         btScanFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 
         setupBT();
+
     }
 
     @Override
@@ -135,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Log.d(TAG, "onResume");
         registerReceiver(btScanReceiver, btScanFilter);
-    }
+}
 
     @Override
     protected void onRestart() {
